@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import md5 from 'md5';
 
 import {
     Grid,
@@ -73,10 +74,12 @@ class Register extends Component {
         }
     }
 
+    saveUser = createdUser => {}
+
     handleSubmit = event => {
         event.preventDefault();
 
-        const { email, password } = this.state;
+        const { email, password, username } = this.state;
         const { isFormValid } = this;
 
         if (isFormValid()) {
@@ -88,7 +91,26 @@ class Register extends Component {
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser);
-                    this.setState({ loading: false });
+                    console.log(md5(createdUser.user.email));
+                    createdUser.user.updateProfile({
+                        displayName: username,
+                        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+                    })
+                    .then(() => {
+                        this.saveUser(createdUser)
+                            .then(() => {
+                                console.log('user saved');
+                            })
+                        this.setState({ loading: false });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        const { errors } = this.state;
+
+                        let updateProfileError = errors.concat(error);
+
+                        this.setState({ errors: updateProfileError, loading: false });
+                    })
                 })
                 .catch(error => {
                     console.log(error);
