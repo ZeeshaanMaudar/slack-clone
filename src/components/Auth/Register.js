@@ -22,7 +22,8 @@ class Register extends Component {
         password: '',
         passwordConfirmation: '',
         errors: [],
-        loading: false
+        loading: false,
+        usersRef: firebase.database().ref('users')
     }
 
     isPasswordValid = ({ password, passwordConfirmation }) => {
@@ -74,7 +75,19 @@ class Register extends Component {
         }
     }
 
-    saveUser = createdUser => {}
+    saveUser = createdUser => {
+        //initially in state, usersRef: firebase.database().ref('users')
+        // this means creates a new database in firebase with a string called users (main parent).
+        const { usersRef } = this.state;
+
+        const { uid, displayName, photoURL } = createdUser.user;
+
+        // here we add a unique id for each user under which there is both name and avatar for each id.
+        return usersRef.child(uid).set({
+            name: displayName,
+            avatar: photoURL
+        });
+    }
 
     handleSubmit = event => {
         event.preventDefault();
@@ -90,8 +103,6 @@ class Register extends Component {
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
-                    console.log(createdUser);
-                    console.log(md5(createdUser.user.email));
                     createdUser.user.updateProfile({
                         displayName: username,
                         photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
@@ -99,9 +110,8 @@ class Register extends Component {
                     .then(() => {
                         this.saveUser(createdUser)
                             .then(() => {
-                                console.log('user saved');
-                            })
-                        this.setState({ loading: false });
+                                this.setState({ loading: false });
+                            });
                     })
                     .catch(error => {
                         console.error(error);
