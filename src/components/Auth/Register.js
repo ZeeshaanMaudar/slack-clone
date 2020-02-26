@@ -68,7 +68,7 @@ class Register extends Component {
         } else {
 
             return true;
-            
+
         }
     }
 
@@ -99,7 +99,13 @@ class Register extends Component {
     render() {
         const { handleSubmit, handleChange } = this;
 
-        const { username, email, password, passwordConfirmation } = this.state;
+        const { username, email, password, passwordConfirmation, errors } = this.state;
+
+        const displayErrors = errors => {
+            return errors.map((error, index) => (
+                <p key={index}>{error.message}</p>
+            ))
+        }
 
         return (
             <Grid textAlign='center' verticalAlign='middle' className='app'>
@@ -153,6 +159,12 @@ class Register extends Component {
                             <Button color='orange' fluid size='large'>Submit</Button>
                         </Segment>
                     </Form>
+                    {errors.length > 0 && (
+                        <Message error>
+                            <h3>Error</h3>
+                            {displayErrors(errors)}
+                        </Message>
+                    )}
                     <Message>Already a user? <Link to='/login'>Login</Link> </Message>
                 </Grid.Column>
             </Grid>
