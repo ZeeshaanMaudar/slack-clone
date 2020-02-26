@@ -19,22 +19,77 @@ class Register extends Component {
         username: '',
         email: '',
         password: '',
-        passwordConfirmation: ''
+        passwordConfirmation: '',
+        errors: []
+    }
+
+    isPasswordValid = ({ password, passwordConfirmation }) => {
+
+        if (password.length < 6 || passwordConfirmation.length < 6) {
+            return false;
+        } else if (password !== passwordConfirmation) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    isFormEmpty = ({ username, email, password, passwordConfirmation }) => {
+
+        return !username.length || !email.length || !password.length || !passwordConfirmation.length 
+
+    }
+
+    isFormValid = () => {
+        const { state, isFormEmpty, isPasswordValid } = this;
+
+        let errors = [];
+        let error;
+
+        if (isFormEmpty(state)) {
+            
+            error = { message: 'Fill in all fields' }
+            errors = errors.concat(error);
+
+            this.setState({ errors });
+
+            return false;
+
+        } else if (!isPasswordValid(state)) {
+
+            error = { message: 'Password is invalid' }
+            errors = errors.concat(error);
+
+            this.setState({ errors });
+
+            return false;
+
+        } else {
+
+            return true;
+            
+        }
     }
 
     handleSubmit = event => {
         const { email, password } = this.state;
+        const { isFormValid } = this;
 
-        event.preventDefault();
-        firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then(createdUser => {
-                console.log(createdUser);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        if (isFormValid()) {
+
+            event.preventDefault();
+            firebase
+                .auth()
+                .createUserWithEmailAndPassword(email, password)
+                .then(createdUser => {
+                    console.log(createdUser);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+
+        }
     }
 
     handleChange = event => {
