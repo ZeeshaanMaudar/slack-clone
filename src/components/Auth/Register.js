@@ -110,7 +110,7 @@ class Register extends Component {
                     .then(() => {
                         this.saveUser(createdUser)
                             .then(() => {
-                                this.setState({ loading: false });
+                                this.setState({ loading: false, username: '', email: '', password: '', passwordConfirmation: '', });
                             });
                     })
                     .catch(error => {
@@ -123,7 +123,7 @@ class Register extends Component {
                     })
                 })
                 .catch(error => {
-                    
+
                     const { errors } = this.state;
 
                     let authError = errors.concat(error);
