@@ -11,6 +11,8 @@ import {
     Icon
 } from 'semantic-ui-react';
 
+import firebase from '../../firebase';
+
 class Register extends Component {
 
     state = {
@@ -21,7 +23,18 @@ class Register extends Component {
     }
 
     handleSubmit = event => {
+        const { email, password } = this.state;
+
         event.preventDefault();
+        firebase
+            .auth()
+            .createUserWithEmailAndPassword(email, password)
+            .then(createdUser => {
+                console.log(createdUser);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     handleChange = event => {
