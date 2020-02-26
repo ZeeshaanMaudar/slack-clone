@@ -17,15 +17,21 @@ class Register extends Component {
         username: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        passwordConfirmation: ''
+    }
+
+    handleSubmit = event => {
+        event.preventDefault();
     }
 
     handleChange = event => {
-        console.log(event.target.value);
+        this.setState({ [event.target.name]: event.target.value })
     }
 
     render() {
-        const { handleChange } = this;
+        const { handleSubmit, handleChange } = this;
+
+        const { username, email, password, passwordConfirmation } = this.state;
 
         return (
             <Grid textAlign='center' verticalAlign='middle' className='app'>
@@ -34,7 +40,7 @@ class Register extends Component {
                         <Icon name='puzzle piece' color='orange' />
                         Register for ZeeChat
                     </Header>
-                    <Form size='large'>
+                    <Form size='large' onSubmit={handleSubmit}>
                         <Segment stacked>
                             <Form.Input
                                 fluid
@@ -43,6 +49,7 @@ class Register extends Component {
                                 icon='user'
                                 iconPosition='left'
                                 placeholder='Username'
+                                value={username}
                                 onChange={handleChange}
                             />
                             <Form.Input
@@ -52,6 +59,7 @@ class Register extends Component {
                                 icon='mail'
                                 iconPosition='left'
                                 placeholder='Email Address'
+                                value={email}
                                 onChange={handleChange}
                             />
                             <Form.Input
@@ -61,15 +69,17 @@ class Register extends Component {
                                 icon='lock'
                                 iconPosition='left'
                                 placeholder='Password'
+                                value={password}
                                 onChange={handleChange}
                             />
                             <Form.Input
                                 fluid
                                 type='password'
-                                name='confirmPassword'
+                                name='passwordConfirmation'
                                 icon='repeat'
                                 iconPosition='left'
                                 placeholder='Confirm Password'
+                                value={passwordConfirmation}
                                 onChange={handleChange}
                             />
                             <Button color='orange' fluid size='large'>Submit</Button>
