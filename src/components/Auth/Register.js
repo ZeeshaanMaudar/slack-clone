@@ -123,7 +123,7 @@ class Register extends Component {
                     })
                 })
                 .catch(error => {
-                    console.log(error);
+                    
                     const { errors } = this.state;
 
                     let authError = errors.concat(error);
