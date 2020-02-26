@@ -20,7 +20,8 @@ class Register extends Component {
         email: '',
         password: '',
         passwordConfirmation: '',
-        errors: []
+        errors: [],
+        loading: false
     }
 
     isPasswordValid = ({ password, passwordConfirmation }) => {
@@ -73,20 +74,29 @@ class Register extends Component {
     }
 
     handleSubmit = event => {
+        event.preventDefault();
+
         const { email, password } = this.state;
         const { isFormValid } = this;
 
         if (isFormValid()) {
 
-            event.preventDefault();
+            this.setState({ errors: [], loading: true });
+
             firebase
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(createdUser => {
                     console.log(createdUser);
+                    this.setState({ loading: false });
                 })
                 .catch(error => {
                     console.log(error);
+                    const { errors } = this.state;
+
+                    let authError = errors.concat(error);
+
+                    this.setState({ errors: authError, loading: false });
                 });
 
         }
@@ -96,10 +106,14 @@ class Register extends Component {
         this.setState({ [event.target.name]: event.target.value })
     }
 
-    render() {
-        const { handleSubmit, handleChange } = this;
+    handleInputError = (errors, inputName) => {
+        return errors.some(error => error.message.toLowerCase().includes(inputName)) ? 'error' : '';
+    }
 
-        const { username, email, password, passwordConfirmation, errors } = this.state;
+    render() {
+        const { handleSubmit, handleChange, handleInputError } = this;
+
+        const { username, email, password, passwordConfirmation, errors, loading } = this.state;
 
         const displayErrors = errors => {
             return errors.map((error, index) => (
@@ -123,6 +137,7 @@ class Register extends Component {
                                 icon='user'
                                 iconPosition='left'
                                 placeholder='Username'
+                                className={handleInputError(errors, 'username')}
                                 value={username}
                                 onChange={handleChange}
                             />
@@ -133,6 +148,7 @@ class Register extends Component {
                                 icon='mail'
                                 iconPosition='left'
                                 placeholder='Email Address'
+                                className={handleInputError(errors, 'email')}
                                 value={email}
                                 onChange={handleChange}
                             />
@@ -143,6 +159,7 @@ class Register extends Component {
                                 icon='lock'
                                 iconPosition='left'
                                 placeholder='Password'
+                                className={handleInputError(errors, 'password')}
                                 value={password}
                                 onChange={handleChange}
                             />
@@ -153,10 +170,19 @@ class Register extends Component {
                                 icon='repeat'
                                 iconPosition='left'
                                 placeholder='Confirm Password'
+                                className={handleInputError(errors, 'passwordConfirmation')}
                                 value={passwordConfirmation}
                                 onChange={handleChange}
                             />
-                            <Button color='orange' fluid size='large'>Submit</Button>
+                            <Button
+                                className={loading ? 'loading ': ''}
+                                disabled={loading}
+                                color='orange'
+                                fluid
+                                size='large'
+                            >
+                                Submit
+                            </Button>
                         </Segment>
                     </Form>
                     {errors.length > 0 && (
