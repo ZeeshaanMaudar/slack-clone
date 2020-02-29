@@ -12,11 +12,10 @@ import Register from './components/Auth/Register';
 import * as serviceWorker from './serviceWorker';
 import firebase from './firebase';
 import rootReducer from './reducers';
-import { setUser } from './actions';
+import { setUser, clearUser } from './actions';
 import Spinner from './Spinner';
 
 import 'semantic-ui-css/semantic.min.css';
-
 
 const store = createStore(rootReducer, composeWithDevTools());
 
@@ -29,6 +28,9 @@ class Root extends Component {
                 console.log('user: ', user);
                 this.props.setUser(user);
                 this.props.history.push('/');
+            } else {
+                this.props.history.push('/login');
+                this.props.clearUser();
             }
         })
     }
@@ -54,7 +56,7 @@ const mapStateFromProps = state => ({
     isLoading: state.user.isLoading
 });
 
-const RoothWithAuth = withRouter(connect(mapStateFromProps, { setUser })(Root));
+const RoothWithAuth = withRouter(connect(mapStateFromProps, { setUser, clearUser })(Root));
 
 ReactDOM.render(
     <Provider store={store}>
