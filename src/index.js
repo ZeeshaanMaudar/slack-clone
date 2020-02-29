@@ -4,7 +4,7 @@ import 'semantic-ui-css/semantic.min.css';
 
 import { BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-dom';
 import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import App from './components/App';
@@ -12,9 +12,11 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import * as serviceWorker from './serviceWorker';
 import firebase from './firebase';
+import rootReducer from './reducers';
+import { setUser } from './actions';
 
 
-const store = createStore(() => {}, composeWithDevTools());
+const store = createStore(rootReducer, composeWithDevTools());
 
 class Root extends Component {
 
@@ -22,6 +24,7 @@ class Root extends Component {
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 console.log('user: ', user);
+                this.props.setUser(user);
                 this.props.history.push('/');
             }
         })
@@ -38,7 +41,7 @@ class Root extends Component {
     }
 }
 
-const RoothWithAuth = withRouter(Root);
+const RoothWithAuth = withRouter(connect(null, { setUser })(Root));
 
 ReactDOM.render(
     <Provider store={store}>
