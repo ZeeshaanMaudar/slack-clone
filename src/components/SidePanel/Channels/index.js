@@ -13,6 +13,18 @@ export class Channels extends Component {
         channelsRef: firebase.database().ref('channels')
     }
 
+    addListeners = () => {
+        let loadedChannels = [];
+        this.state.channelsRef.on('child_added', snap => {
+            loadedChannels.push(snap.val());
+            this.setState({ channels: loadedChannels });
+        })
+    }
+
+    componentDidMount() {
+        this.addListeners();
+    }
+
     closeModal = () => this.setState({ modal: false });
 
     openModal = () => this.setState({ modal: true });
@@ -27,7 +39,7 @@ export class Channels extends Component {
     }
 
     addChannel = () => {
-        const { channelsRef, channelName, channelDetails } = this.state;
+        const { channelsRef, channelName, channelDetails, channels } = this.state;
         const { displayName, photoURL } = this.props.currentUser;
         const { closeModal } = this;
 
@@ -70,6 +82,23 @@ export class Channels extends Component {
         const { channels, modal } = this.state;
         const { closeModal, handleChange, openModal, handleSubmit } = this;
 
+        const displayChannels = channels => {
+            if(channels.length > 0) {
+                return channels.map(({ id, name }) => (
+                    <Menu.Item
+                        key={id}
+                        onClick={() => console.log(name)}
+                        {...{ name }}
+                        style={{ opacity: 0.7 }}
+                    >
+                        # {name}
+                    </Menu.Item>
+                ))
+            }
+
+            return null;
+        }
+
         return (
             <Fragment>
                 <Menu.Menu style={{ paddingBottom: '2em' }}>
@@ -79,7 +108,7 @@ export class Channels extends Component {
                         </span>{' '}
                         ({channels.length}) <Icon name='add' onClick={openModal} />
                     </Menu.Item>
-
+                    {displayChannels(channels)}
                 </Menu.Menu>
 
                 <Modal
