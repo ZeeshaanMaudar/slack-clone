@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import 'semantic-ui-css/semantic.min.css';
 
 import { BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-dom';
 import { createStore } from 'redux';
@@ -15,6 +14,8 @@ import firebase from './firebase';
 import rootReducer from './reducers';
 import { setUser } from './actions';
 import Spinner from './Spinner';
+
+import 'semantic-ui-css/semantic.min.css';
 
 
 const store = createStore(rootReducer, composeWithDevTools());
