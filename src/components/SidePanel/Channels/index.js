@@ -1,5 +1,8 @@
 import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
+
+import { setCurrentChannel } from '../../../actions';
 
 import firebase from '../../../firebase';
 
@@ -68,6 +71,11 @@ export class Channels extends Component {
             })
     }
 
+    changeChannel = channel => {
+        const { setCurrentChannel } = this.props;
+        setCurrentChannel(channel)
+    }
+
     handleSubmit = event => {
         event.preventDefault();
 
@@ -80,18 +88,18 @@ export class Channels extends Component {
 
     render() {
         const { channels, modal } = this.state;
-        const { closeModal, handleChange, openModal, handleSubmit } = this;
+        const { closeModal, handleChange, openModal, handleSubmit, changeChannel } = this;
 
         const displayChannels = channels => {
             if(channels.length > 0) {
-                return channels.map(({ id, name }) => (
+                return channels.map((channel) => (
                     <Menu.Item
-                        key={id}
-                        onClick={() => console.log(name)}
-                        {...{ name }}
+                        key={channel.id}
+                        onClick={() => changeChannel(channel)}
+                        name={channel.name}
                         style={{ opacity: 0.7 }}
                     >
-                        # {name}
+                        # {channel.name}
                     </Menu.Item>
                 ))
             }
@@ -151,4 +159,4 @@ export class Channels extends Component {
     }
 }
 
-export default Channels;
+export default connect(null, { setCurrentChannel })(Channels);
