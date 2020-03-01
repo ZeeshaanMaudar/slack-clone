@@ -23,7 +23,7 @@ class UserPanel extends Component {
         const { handleSignOut } = this;
         const { user } = this.state;
 
-        const { displayName, photoUrl } = user;
+        const { displayName, photoURL } = user;
 
         const dropdownOptions = [
             {
@@ -55,7 +55,7 @@ class UserPanel extends Component {
                         <Dropdown
                             trigger={
                                 <span>
-                                    <Image src={photoUrl} spaced='right' avatar />
+                                    <Image src={photoURL} spaced='right' avatar />
                                     {displayName}
                                 </span>
                             }
