@@ -59,7 +59,7 @@ export class Channels extends Component {
     }
 
     addChannel = () => {
-        const { channelsRef, channelName, channelDetails, channels } = this.state;
+        const { channelsRef, channelName, channelDetails } = this.state;
         const { displayName, photoURL } = this.props.currentUser;
         const { closeModal } = this;
 
