@@ -23,7 +23,7 @@ export class Channels extends Component {
         this.state.channelsRef.on('child_added', snap => {
             loadedChannels.push(snap.val());
             this.setState({ channels: loadedChannels }, () => {
-                this.setFirstChannel()
+                this.setFirstChannel();
             });
         })
     }
