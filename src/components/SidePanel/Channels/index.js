@@ -13,15 +13,32 @@ export class Channels extends Component {
         modal: false,
         channelName: '',
         channelDetails: '',
-        channelsRef: firebase.database().ref('channels')
+        channelsRef: firebase.database().ref('channels'),
+        firstLoad: true,
+        activeChannel: ''
     }
 
     addListeners = () => {
         let loadedChannels = [];
         this.state.channelsRef.on('child_added', snap => {
             loadedChannels.push(snap.val());
-            this.setState({ channels: loadedChannels });
+            this.setState({ channels: loadedChannels }, () => {
+                this.setFirstChannel()
+            });
         })
+    }
+
+    setFirstChannel = () => {
+        const { channels, firstLoad } = this.state;
+
+        const firstChannel = channels[0];
+
+        if (firstLoad && channels.length > 0) {
+            this.props.setCurrentChannel(firstChannel);
+            this.setActiveChannel(firstChannel);
+        }
+
+        this.setState({ firstLoad: false });
     }
 
     componentDidMount() {
@@ -71,9 +88,14 @@ export class Channels extends Component {
             })
     }
 
+    setActiveChannel = channel => {
+        this.setState({ activeChannel: channel.id });
+    }
+
     changeChannel = channel => {
         const { setCurrentChannel } = this.props;
-        setCurrentChannel(channel)
+        this.setActiveChannel(channel);
+        setCurrentChannel(channel);
     }
 
     handleSubmit = event => {
@@ -86,8 +108,16 @@ export class Channels extends Component {
         }
     }
 
+    removeListeners = () => {
+        this.state.channelsRef.off();
+    }
+
+    componentWillUnmount() {
+        this.removeListeners();
+    }
+
     render() {
-        const { channels, modal } = this.state;
+        const { channels, modal, activeChannel } = this.state;
         const { closeModal, handleChange, openModal, handleSubmit, changeChannel } = this;
 
         const displayChannels = channels => {
@@ -98,6 +128,7 @@ export class Channels extends Component {
                         onClick={() => changeChannel(channel)}
                         name={channel.name}
                         style={{ opacity: 0.7 }}
+                        active={channel.id === activeChannel}
                     >
                         # {channel.name}
                     </Menu.Item>
