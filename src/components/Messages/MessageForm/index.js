@@ -159,6 +159,7 @@ export class MessageForm extends Component {
                         labelPosition='right'
                         icon='cloud upload'
                         onClick={openModal}
+                        disabled={uploadState === 'uploading'}
                     />
                 </Button.Group>
                 <FileModal
