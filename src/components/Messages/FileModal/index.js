@@ -8,7 +8,7 @@ export class FileModal extends Component {
         authorized: ['image/jpeg', 'image/png']
     }
 
-    handleChange = event => {
+    addFile = event => {
         const file = event.target.files[0];
 
         if (file) {
@@ -37,7 +37,7 @@ export class FileModal extends Component {
 
     render() {
         const { modal, closeModal } = this.props;
-        const { handleChange, sendFile } = this;
+        const { addFile, sendFile } = this;
 
         return (
             <Modal
@@ -52,7 +52,7 @@ export class FileModal extends Component {
                         label='File types: jpg, png'
                         name='file'
                         type='file'
-                        onChange={handleChange}
+                        onChange={addFile}
                     />
                 </Modal.Content>
                 <Modal.Actions>
