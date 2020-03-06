@@ -13,7 +13,8 @@ class Messages extends Component {
         user: this.props.currentUser,
         messages: [],
         messagesLoading: true,
-        progressBar: false
+        progressBar: false,
+        numUniqueUsers: ''
     }
 
     componentDidMount() {
@@ -31,7 +32,24 @@ class Messages extends Component {
         messagesRef.child(channelId).on('child_added', snap => {
             loadedmessages.push(snap.val());
             this.setState({ messages: loadedmessages, messagesLoading: false });
+            this.countUniqueUsers(loadedmessages);
         });
+    }
+
+    countUniqueUsers = messages => {
+        const uniqueUsers = messages.reduce((acc, message) => {
+
+            if (!acc.includes(message.user.name)) {
+                acc.push(message.user.name);
+            }
+            return acc;
+        }, []);
+
+        const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0;
+
+        const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's' : ''}`;
+
+        this.setState({ numUniqueUsers });
     }
 
     addListeners = channelId => {
@@ -46,7 +64,7 @@ class Messages extends Component {
 
 
     render() {
-        const { messagesRef, channel, user, messages, progressBar } = this.state;
+        const { messagesRef, channel, user, messages, progressBar, numUniqueUsers } = this.state;
         const { isProgressBarVisible } = this;
 
         const displayMessages = () => {
@@ -62,6 +80,7 @@ class Messages extends Component {
         return (
             <Fragment>
                 <MessagesHeader
+                    {...{ numUniqueUsers }}
                     channelName={displayChannelName(channel)}
                 />
                 <Segment>
