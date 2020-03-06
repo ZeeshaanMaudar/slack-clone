@@ -44,6 +44,7 @@ class Messages extends Component {
         }
     }
 
+
     render() {
         const { messagesRef, channel, user, messages, progressBar } = this.state;
         const { isProgressBarVisible } = this;
@@ -56,9 +57,13 @@ class Messages extends Component {
             return null;
         }
 
+        const displayChannelName = channel => channel ? `#${channel.name}` : '';
+
         return (
             <Fragment>
-                <MessagesHeader />
+                <MessagesHeader
+                    channelName={displayChannelName(channel)}
+                />
                 <Segment>
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
                         {displayMessages()}
