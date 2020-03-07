@@ -13,7 +13,11 @@ class Messages extends Component {
         user: this.props.currentUser,
         messages: [],
         messagesLoading: true,
-        progressBar: false
+        progressBar: false,
+        numUniqueUsers: '',
+        searchTerm: '',
+        searchLoading: false,
+        searchResults: []
     }
 
     componentDidMount() {
@@ -31,7 +35,45 @@ class Messages extends Component {
         messagesRef.child(channelId).on('child_added', snap => {
             loadedmessages.push(snap.val());
             this.setState({ messages: loadedmessages, messagesLoading: false });
+            this.countUniqueUsers(loadedmessages);
         });
+    }
+
+    countUniqueUsers = messages => {
+        const uniqueUsers = messages.reduce((acc, message) => {
+
+            if (!acc.includes(message.user.name)) {
+                acc.push(message.user.name);
+            }
+            return acc;
+        }, []);
+
+        const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0;
+
+        const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's' : ''}`;
+
+        this.setState({ numUniqueUsers });
+    }
+
+    handleSearchChange = event => {
+        let searchTerm = event.target.value;
+
+        this.setState({ searchTerm, searchLoading: true }, () => this.handleSearchMessages());
+    }
+
+    handleSearchMessages = () => {
+        const channelMessages = [...this.state.messages];
+        const regex = new RegExp(this.state.searchTerm, 'gi');
+
+        const searchResults = channelMessages.reduce((acc, message) => {
+            if ((message.content && message.content.match(regex)) || message.user.name.match(regex)) {
+                acc.push(message);
+            }
+            return acc;
+        }, []);
+
+        this.setState({ searchResults });
+        setTimeout(() => this.setState({ searchLoading: false }), 1000);
     }
 
     addListeners = channelId => {
@@ -44,11 +86,24 @@ class Messages extends Component {
         }
     }
 
-    render() {
-        const { messagesRef, channel, user, messages, progressBar } = this.state;
-        const { isProgressBarVisible } = this;
 
-        const displayMessages = () => {
+    render() {
+
+        const {
+            messagesRef,
+            channel,
+            user,
+            messages,
+            progressBar,
+            numUniqueUsers,
+            searchTerm,
+            searchResults,
+            searchLoading
+        } = this.state;
+
+        const { isProgressBarVisible, handleSearchChange } = this;
+
+        const displayMessages = messages => {
             if (messages.length > 0) {
                 return messages.map(message => <Message key={message.timestamp} message={message} user={user} />);
             }
@@ -56,12 +111,17 @@ class Messages extends Component {
             return null;
         }
 
+        const displayChannelName = channel => channel ? `#${channel.name}` : '';
+
         return (
             <Fragment>
-                <MessagesHeader />
+                <MessagesHeader
+                    {...{ numUniqueUsers, handleSearchChange, searchLoading }}
+                    channelName={displayChannelName(channel)}
+                />
                 <Segment>
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages'}>
-                        {displayMessages()}
+                        {searchTerm ? displayMessages(searchResults) : displayMessages(messages) }
                     </Comment.Group>
                 </Segment>
                 <MessageForm
