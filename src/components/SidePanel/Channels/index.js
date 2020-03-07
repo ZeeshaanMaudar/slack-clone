@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
 
-import { setCurrentChannel } from '../../../actions';
+import { setCurrentChannel, setPrivateChannel } from '../../../actions';
 
 import firebase from '../../../firebase';
 
@@ -93,9 +93,10 @@ export class Channels extends Component {
     }
 
     changeChannel = channel => {
-        const { setCurrentChannel } = this.props;
+        const { setCurrentChannel, setPrivateChannel } = this.props;
         this.setActiveChannel(channel);
         setCurrentChannel(channel);
+        setPrivateChannel(false);
     }
 
     handleSubmit = event => {
@@ -190,4 +191,4 @@ export class Channels extends Component {
     }
 }
 
-export default connect(null, { setCurrentChannel })(Channels);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(Channels);
