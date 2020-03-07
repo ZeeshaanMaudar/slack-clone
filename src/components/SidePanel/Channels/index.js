@@ -17,7 +17,7 @@ export class Channels extends Component {
         firstLoad: true,
         activeChannel: '',
         channel: null,
-        messagesRef: firebase.dabatabase().ref('messages'),
+        messagesRef: firebase.database().ref('messages'),
         notifications: []
     }
 
