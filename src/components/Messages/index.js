@@ -17,7 +17,9 @@ class Messages extends Component {
         numUniqueUsers: '',
         searchTerm: '',
         searchLoading: false,
-        searchResults: []
+        searchResults: [],
+        isPrivateChannel: this.props.isPrivateChannel,
+        privateMessagesRef: firebase.database().ref('privateMessages')
     }
 
     componentDidMount() {
@@ -29,14 +31,21 @@ class Messages extends Component {
     }
 
     addMessageListener = channelId => {
-        const { messagesRef } = this.state;
 
         let loadedmessages = [];
-        messagesRef.child(channelId).on('child_added', snap => {
+        const ref = this.getMessagesRef();
+
+        ref.child(channelId).on('child_added', snap => {
             loadedmessages.push(snap.val());
             this.setState({ messages: loadedmessages, messagesLoading: false });
             this.countUniqueUsers(loadedmessages);
         });
+    }
+
+    getMessagesRef = () => {
+        const { messagesRef, privateMessagesRef, isPrivateChannel} = this.state;
+
+        return isPrivateChannel ? privateMessagesRef : messagesRef;
     }
 
     countUniqueUsers = messages => {
@@ -98,10 +107,11 @@ class Messages extends Component {
             numUniqueUsers,
             searchTerm,
             searchResults,
-            searchLoading
+            searchLoading,
+            isPrivateChannel
         } = this.state;
 
-        const { isProgressBarVisible, handleSearchChange } = this;
+        const { isProgressBarVisible, handleSearchChange, getMessagesRef } = this;
 
         const displayMessages = messages => {
             if (messages.length > 0) {
@@ -111,12 +121,15 @@ class Messages extends Component {
             return null;
         }
 
-        const displayChannelName = channel => channel ? `#${channel.name}` : '';
+        const displayChannelName = channel => {
+            const { isPrivateChannel } = this.state;
+            return channel ? `${isPrivateChannel ? '@' : '#'}${channel.name}` : '';
+        }
 
         return (
             <Fragment>
                 <MessagesHeader
-                    {...{ numUniqueUsers, handleSearchChange, searchLoading }}
+                    {...{ numUniqueUsers, handleSearchChange, searchLoading, isPrivateChannel }}
                     channelName={displayChannelName(channel)}
                 />
                 <Segment>
@@ -125,7 +138,7 @@ class Messages extends Component {
                     </Comment.Group>
                 </Segment>
                 <MessageForm
-                    {...{ messagesRef, isProgressBarVisible }}
+                    {...{ messagesRef, isProgressBarVisible, isPrivateChannel, getMessagesRef }}
                     currentUser={user}
                     currentChannel={channel}
                 />

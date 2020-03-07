@@ -5,6 +5,10 @@ body,
   background: #eee;
 }
 
+.menu {
+  padding-bottom: 2em;
+}
+
 .messages {
   height: 62vh;
   overflow-y: scroll;
